@@ -1,10 +1,37 @@
 <template>
   <div id="main-view">
+    <albums-view v-show="(currentView === 'Albums')"></albums-view>
+    <artists-view v-show="(currentView === 'Artists')"></artists-view>
   </div>
 </template>
 
 <script>
+import AlbumsView from './AlbumsView.vue';
+import ArtistsView from './ArtistsView.vue';
+import * as Vibrant from 'node-vibrant';
+import bus from './bus.js';
 
+export default {
+  mounted () {
+    bus.$on('tab-changed', this.changeView);
+  },
+  methods: {
+    changeView(newTab) {
+      this.currentView = newTab;
+      this.$Lazyload.lazyLoadHandler();
+      this.$Lazyload.lazyLoadHandler();
+    }
+  },
+  data () {
+    return {
+      currentView: 'Albums'
+    }
+  },
+  components: {
+    AlbumsView,
+    ArtistsView,
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -18,6 +45,6 @@
   top: 0;
   background: $light-grey;
   z-index: 2;
-  box-shadow: 0px 0px 0px 0px rgba(155,155,155,0.5);
+  box-shadow: $menu-shadow;
 }
 </style>

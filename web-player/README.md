@@ -1,6 +1,9 @@
 # song-serve-frontend
 
+> ![demo](/screenshots/demo.gif)
+
 > Web player for song-serve server
+
 
 ## Build Setup
 

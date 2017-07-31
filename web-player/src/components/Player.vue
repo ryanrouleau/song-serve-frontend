@@ -42,6 +42,21 @@ export default {
     });
     this.scrubberEl.addEventListener('mousedown', this.scrubberHold);
     window.addEventListener('mouseup', this.scrubberRelease);
+    window.addEventListener('keydown', e => {
+      if (e.keyCode === 32) {
+        e.preventDefault();
+        if (this.playing) this.pause();
+        else this.play();
+        return false;
+      }
+      else if (e.keyCode === 39) {
+        bus.$emit('next-song');
+      }
+      else if (e.keyCode === 37) {
+        bus.$emit('prev-song');
+      }
+    });
+    //window.addEventListener('')
 
     this.updatingTime = this.updateTime();
     this.duration = this.audioEl.duration;
@@ -106,7 +121,6 @@ export default {
       let pixelsPlayed = this.timelineWidth * (newTime / this.duration);
       this.scrubberStyle.transform = `translate(${pixelsPlayed}px, -5px)`;
       if (newTime === this.duration && this.duration !== 0) {
-        console.log(this.duration);
         this.playing = false;
         bus.$emit('next-song');
       }
@@ -193,6 +207,7 @@ export default {
   width: 15px;
   border-radius: 50%;
   cursor: pointer;
+  background: #f2f2f2;
   //transition: 0.1s linear;
   transition: height 0.1s ease, width 0.1s ease, margin-top 0.1s ease;
 }
@@ -333,10 +348,10 @@ export default {
 }
 .artwork {
   transition: 0.6s ease;
-  height: calc(#{$player-height} + 50px);
-  width: calc(#{$player-height} + 50px);
-  margin-top: -71px;
-  margin-left: calc(#{$sidebar-width}/2 - #{$player-height}/2 - 25px);
+  height: calc(#{$player-height} + 75px);
+  width: calc(#{$player-height} + 75px);
+  margin-top: -90px;
+  margin-left: calc(#{$sidebar-width}/2 - #{$player-height}/2 - 37px);
   //margin-left: 25px;
   background-size: cover !important;
   background-position: center center !important;
@@ -386,7 +401,7 @@ export default {
     font-size: 22px;
     font-weight: 900;
     margin-bottom: 7px;
-    width: 490px;
+    width: calc(50% - 130px);
     //padding-right: 45px;
     overflow: hidden;
     white-space: nowrap;
@@ -396,7 +411,7 @@ export default {
   .player-artist {
     font-size: 16px;
     font-weight: 700;
-    width: 490px;
+    width: calc(50% - 130px);
     //padding-right: 30px;
     overflow: hidden;
     white-space: nowrap;

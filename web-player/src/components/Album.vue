@@ -70,7 +70,7 @@ $card-detail-height: 66px;
 
 }
 .generic-card:hover {
-  box-shadow: 0px 0px 40px 0px rgba(0,0,0, 0.1), 0px 17px 25px 0px rgba(0,0,0, 0.2);
+  box-shadow: 0px 0px 40px 0px rgba(0,0,0, 0.1), 0px 17px 21px 0px rgba(0,0,0, 0.2);
   transform: translateY(-5px);
   color: rgba(255,255,255,1);
   transform: scale(1.01) translateY(-5px);

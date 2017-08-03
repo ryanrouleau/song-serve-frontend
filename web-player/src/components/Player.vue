@@ -12,7 +12,7 @@
     <button v-if="this.playing" @click="pause" id="pause-bttn" class="generic-p-bttn" :style="this.bttnStyleObject"></button>
     <button id="next" class="generic-p-bttn queue-bttn" :style="this.bttnStyleObject" @click="nextSong"></button>
     <div id="duration">
-      {{ secToMin(currentTime)}} / {{ secToMin(duration) }}
+      {{ secToMin(currentTime) }} / {{ secToMin(duration) }}
     </div>
     <div id="timeline" @click="this.moveScrubber">
       <div id="scrubber" :style="this.scrubberStyle"></div>

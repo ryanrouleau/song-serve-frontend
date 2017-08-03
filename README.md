@@ -1,12 +1,12 @@
 # Song Serve Frontend
 
-> Web player for song-serve server
+Web player for song-serve server
 
-> ![webdemo](/screenshots/demo.gif)
+![webdemo](/screenshots/demo.gif)
 
-> PyQt Library Management UI
+PyQt Library Management UI
 
-> ![qtdemo](/screenshots/Qt.png)
+![qtdemo](/screenshots/Qt.png)
 
 ## Build And Run Vue Web Music Player
 

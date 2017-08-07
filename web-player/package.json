@@ -11,10 +11,8 @@
   "dependencies": {
     "axios": "^0.16.2",
     "node-vibrant": "^3.0.0-alpha.2",
-    "style-loader": "^0.18.2",
     "vue": "^2.4.2",
-    "vue-lazyload": "^1.0.6",
-    "vue-style-loader": "^3.0.1"
+    "vue-lazyload": "^1.0.6"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
@@ -25,9 +23,13 @@
     "file-loader": "^0.9.0",
     "node-sass": "^4.5.3",
     "sass-loader": "^5.0.1",
+    "style-loader": "^0.18.2",
     "vue-loader": "^12.1.0",
     "vue-template-compiler": "^2.4.2",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.6.1"
-  }
+  },
+  "main": "webpack.config.js",
+  "keywords": [],
+  "license": "ISC"
 }

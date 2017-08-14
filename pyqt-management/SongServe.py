@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+from NodeServerThread import NodeServerThread
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import requests as r
-import sys
-import os
+import sys, time, webbrowser
 
 
 class App(QApplication):
@@ -15,22 +15,29 @@ class App(QApplication):
         QFontDatabase.addApplicationFont('./fonts/Raleway-Bold.ttf')
         QFontDatabase.addApplicationFont('./fonts/Raleway-ExtraBold.ttf')
         self.setApplicationName('Song Serve UI')
-        self.mainWindow = MainWindow(self)
+        self.mainWindow = MainWindow()
         self.mainWindow.show()
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, app):
+    def __init__(self):
         QMainWindow.__init__(self)
-        self.app = app
         self.setStyleSheet('font-family: "Raleway"')
         self.setWindowTitle('Song Serve UI')
-        self.mainWidget = MainWidget()
+        self.nodeThread = NodeServerThread()
+        self.mainWidget = MainWidget(self.nodeThread)
         self.setCentralWidget(self.mainWidget)
+
+    def closeEvent(self, event):
+        # exiting thread always throws error.  We're just silencing it
+        try:
+            self.nodeThread.exitServer()
+        except:
+            pass
 
 
 class MainWidget(QWidget):
-    def __init__(self):
+    def __init__(self, nodeThread):
         QWidget.__init__(self)
         self.setObjectName('MainWidget')
         self.mainLayout = QVBoxLayout(self)
@@ -39,16 +46,24 @@ class MainWidget(QWidget):
         self.title.setStyleSheet('font-size: 32px; font-weight: 700')
         self.title.setAlignment(Qt.AlignCenter)
 
-        self.serverRunning = False
-        self.dirInfo = ''
+        self.dirInfo = None
+        try:
+            self.dirInfo = r.get('http://localhost:3000/api/manage').json()
+        except:
+            print('\n Song Serve server not running.  Starting in new thread...\n')
+            nodeThread.start()
 
-        while not self.serverRunning:
+        # keep trying to hit server until it's responding
+        timeElapsed = 0
+        while self.dirInfo == None:
+            time.sleep(0.25)
             try:
+                timeElapsed += 0.25
                 self.dirInfo = r.get('http://localhost:3000/api/manage').json()
-                print(self.dirInfo)
-                self.serverRunning = True
             except:
-                ServerDialog()
+                if timeElapsed > 2.5:
+                    sys.exit(1)
+                pass
 
         self.dirList = DirList(self.dirInfo['dirs'])
 
@@ -61,6 +76,9 @@ class MainWidget(QWidget):
         self.bttnLayout = QHBoxLayout()
         self.bttnLayout.addWidget(self.addBttn)
         self.bttnLayout.addWidget(self.removeBtttn)
+
+        self.openPlayerBttn = QPushButton('Open Music Player')
+        self.openPlayerBttn.clicked.connect(self.openPlayerInBrowser)
 
         self.infoLayout = QHBoxLayout()
         self.infoLayout.setContentsMargins(10,0,0,0)
@@ -82,6 +100,7 @@ class MainWidget(QWidget):
         self.mainLayout.addWidget(self.title)
         self.mainLayout.addWidget(self.dirList)
         self.mainLayout.addLayout(self.bttnLayout)
+        self.mainLayout.addWidget(self.openPlayerBttn)
         self.mainLayout.addLayout(self.infoLayout)
         self.mainLayout.addWidget(Seperator())
         self.mainLayout.addWidget(self.progressLabel)
@@ -110,6 +129,9 @@ class MainWidget(QWidget):
         self.infoCards['Songs'].bigNum.setText(str(resp['numSongs']))
         self.infoCards['Directories'].bigNum.setText(str(resp['numDirs']))
 
+    def openPlayerInBrowser(self):
+        webbrowser.open('http://localhost:3000')
+
 
 class DirList(QListWidget):
     def __init__(self, dirs):
@@ -129,7 +151,6 @@ class DirList(QListWidget):
             return
 
         self.dirs.append({'absolutePath': path, 'dirId': resp['dirId']})
-        print(self.dirs[len(self.dirs)-1])
         self.addItem(path)
         AddDiag(resp, path)
 
@@ -152,7 +173,6 @@ class DirList(QListWidget):
     def findIndex(self, path):
         index = -1
         for i in range(0, len(self.dirs)):
-            print(i)
             if (self.dirs[i]['absolutePath'] == path):
                 index = i
                 return index
@@ -218,35 +238,6 @@ class InfoCard(QWidget):
         self.label.setAlignment(Qt.AlignCenter)
         self.mainLayout.addWidget(self.bigNum)
         self.mainLayout.addWidget(self.label)
-
-
-class ServerDialog(QDialog):
-    def __init__(self):
-        QDialog.__init__(self)
-        self.setWindowTitle('Start Song Serve Server')
-        self.mainLayout = QVBoxLayout(self)
-
-        self.title = QLabel('Song Serve server not running.')
-        self.title.setStyleSheet('font-size: 22px; font-weight: 600');
-
-        self.howTo = QLabel('\nRun in song-serve dir:')
-        self.howTo.setStyleSheet('font-weight: 700');
-        self.CLIArgs = QLabel('   node app.js <spotify client id> <spotify client secret> <optional --verbose || -v>\n')
-
-        self.tryAgainBttn = QPushButton('Try Again')
-        self.tryAgainBttn.clicked.connect(self.accept)
-        self.exitBttn = QPushButton('Exit')
-        self.exitBttn.clicked.connect(sys.exit)
-
-        self.bttnLayout = QHBoxLayout();
-        self.bttnLayout.addWidget(self.tryAgainBttn)
-        self.bttnLayout.addWidget(self.exitBttn)
-
-        self.mainLayout.addWidget(self.title)
-        self.mainLayout.addWidget(self.howTo);
-        self.mainLayout.addWidget(self.CLIArgs)
-        self.mainLayout.addLayout(self.bttnLayout)
-        self.exec_()
 
 
 class Seperator(QFrame):

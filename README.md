@@ -1,6 +1,6 @@
 # Song Serve Frontend
 
-Web player frontend for my [song-serve](https://github.com/ryanrouleau/song-serve) server
+Web player frontend for the [song-serve](https://github.com/ryanrouleau/song-serve) server
 
 ![webdemo](/screenshots/demo.gif)
 
